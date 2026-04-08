@@ -5,6 +5,7 @@ const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
 const taskSearchInput = document.querySelector("#task-search");
 const taskPriorityInput = document.querySelector("#task-priority");
+const taskDeadlineInput = document.querySelector("#task-deadline");
 const todoList = document.querySelector("#todo-list");
 const doingList = document.querySelector("#doing-list");
 const doneList = document.querySelector("#done-list");
@@ -54,9 +55,40 @@ function moveTask(taskId) {
   render();
 }
 
+function formatDeadline(deadline) {
+  if (!deadline) return "Tanpa deadline";
+
+  const parsedDate = new Date(`${deadline}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Tanpa deadline";
+  }
+
+  return parsedDate.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function isOverdue(task) {
+  if (!task.deadline || task.status === "done") {
+    return false;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const taskDeadline = new Date(`${task.deadline}T00:00:00`);
+
+  if (Number.isNaN(taskDeadline.getTime())) {
+    return false;
+  }
+
+  return taskDeadline < today;
+}
+
 function createTaskCard(task) {
   const item = document.createElement("li");
-  item.className = "task-card";
+  item.className = `task-card${isOverdue(task) ? " task-overdue" : ""}`;
 
   const meta = document.createElement("div");
   meta.className = "task-meta";
@@ -75,13 +107,22 @@ function createTaskCard(task) {
   owner.className = "task-owner";
   owner.textContent = `Owner: ${task.owner}`;
 
+  const deadline = document.createElement("p");
+  deadline.className = "task-deadline";
+  deadline.textContent = `Deadline: ${formatDeadline(task.deadline)}`;
+
+  const overdueBadge = document.createElement("p");
+  overdueBadge.className = "task-overdue-badge";
+  overdueBadge.textContent = "Terlambat";
+  overdueBadge.hidden = !isOverdue(task);
+
   const button = document.createElement("button");
   button.type = "button";
   button.className = "task-action";
   button.textContent = task.status === "done" ? "Reset ke Todo" : "Pindah Tahap";
   button.addEventListener("click", () => moveTask(task.id));
 
-  item.append(meta, owner, button);
+  item.append(meta, owner, deadline, overdueBadge, button);
   return item;
 }
 
@@ -102,7 +143,12 @@ form.addEventListener("submit", (event) => {
   event.preventDefault();
 
   try {
-    const task = createTask(taskTitleInput.value, taskOwnerInput.value, taskPriorityInput.value);
+    const task = createTask(
+      taskTitleInput.value,
+      taskOwnerInput.value,
+      taskPriorityInput.value,
+      taskDeadlineInput.value
+    );
     state.tasks.push(task);
     saveState();
     render();

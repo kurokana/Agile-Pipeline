@@ -135,6 +135,28 @@ button {
   color: #35504a;
 }
 
+.task-deadline {
+  margin: 0 0 0.5rem;
+  color: #4c6a63;
+  font-size: 0.92rem;
+}
+
+.task-overdue {
+  border-color: #cf6b6b;
+}
+
+.task-overdue-badge {
+  margin: 0 0 0.7rem;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #8a1212;
+  background: #fde8e8;
+  border: 1px solid #f3b2b2;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
 .task-action {
   width: 100%;
   background: var(--accent-soft);
