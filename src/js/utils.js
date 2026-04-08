@@ -20,3 +20,15 @@ export function createTask(title, owner) {
     status: "todo"
   };
 }
+
+export function filterTasksByQuery(tasks, query) {
+  const keyword = String(query || "").trim().toLowerCase();
+  if (!keyword) {
+    return tasks;
+  }
+
+  return tasks.filter((task) => {
+    const haystack = `${task.title} ${task.owner}`.toLowerCase();
+    return haystack.includes(keyword);
+  });
+}

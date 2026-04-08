@@ -8,20 +8,21 @@ Fitur singkat:
 - Tambah task baru
 - Simpan task di browser (localStorage)
 - Pindah status task: Todo -> Doing -> Done -> Todo
+- Cari task secara real-time berdasarkan judul atau PIC
 - Pipeline otomatis: lint, unit test, build, artifact upload
 
-## 2. Susunan Tim (contoh, silakan ganti)
-- Product Owner: Nama 1
-- Scrum Master: Nama 2
-- Developer: Nama 3
-- QA/Tester: Nama 4
+## 2. Susunan Tim 
+- Surya Bagaskara             2315061031
+- Dimas Faqih Nur Aulia Roman 231506159
+- Muhammad Favian Rizki       2315061067
+- Muhammad Faisal             2315061111
 
 ## 3. Ringkasan Aplikasi
 Aplikasi web statis sederhana untuk membantu tim memantau task harian. Aplikasi ini dipilih karena ringan, mudah dipresentasikan, dan fokus penilaian ada pada proses pipeline serta gitflow.
 
 ## 4. Version Control
 - Platform: GitHub
-- Branch utama: `master` (boleh `main`, sesuaikan repository)
+- Branch utama: `master` 
 - Strategi gitflow sederhana:
   1. Buat branch fitur dari `master`: `feature/nama-fitur`
   2. Commit perubahan
