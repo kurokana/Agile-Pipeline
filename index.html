@@ -18,6 +18,11 @@
         <form id="task-form">
           <input id="task-title" type="text" placeholder="Nama task" required />
           <input id="task-owner" type="text" placeholder="PIC" />
+          <select id="task-priority" aria-label="Priority task">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
           <button type="submit">Tambah</button>
         </form>
         <div class="sort-wrap">
@@ -28,6 +33,12 @@
             <option value="title-asc">A ke Z</option>
           </select>
         </div>
+        <input
+          id="task-search"
+          type="text"
+          placeholder="Cari task berdasarkan judul atau PIC"
+          aria-label="Cari task"
+        />
       </section>
 
       <section class="board">

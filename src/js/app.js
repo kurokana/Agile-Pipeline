@@ -1,9 +1,12 @@
 import { createTask, sortTasks } from "./utils.js";
+import { createTask, filterTasksByQuery } from "./utils.js";
 
 const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
 const sortModeSelect = document.querySelector("#sort-mode");
+const taskSearchInput = document.querySelector("#task-search");
+const taskPriorityInput = document.querySelector("#task-priority");
 const todoList = document.querySelector("#todo-list");
 const doingList = document.querySelector("#doing-list");
 const doneList = document.querySelector("#done-list");
@@ -17,6 +20,7 @@ const lists = {
 const state = {
   tasks: [],
   sortMode: "oldest"
+  searchQuery: ""
 };
 
 function saveState() {
@@ -67,9 +71,18 @@ function createTaskCard(task) {
   const item = document.createElement("li");
   item.className = "task-card";
 
+  const meta = document.createElement("div");
+  meta.className = "task-meta";
+
   const title = document.createElement("p");
   title.className = "task-title";
   title.textContent = task.title;
+
+  const priority = document.createElement("span");
+  priority.className = `priority-badge priority-${task.priority || "medium"}`;
+  priority.textContent = (task.priority || "medium").toUpperCase();
+
+  meta.append(title, priority);
 
   const owner = document.createElement("p");
   owner.className = "task-owner";
@@ -81,7 +94,7 @@ function createTaskCard(task) {
   button.textContent = task.status === "done" ? "Reset ke Todo" : "Pindah Tahap";
   button.addEventListener("click", () => moveTask(task.id));
 
-  item.append(title, owner, button);
+  item.append(meta, owner, button);
   return item;
 }
 
@@ -91,6 +104,9 @@ function render() {
   });
 
   sortTasks(state.tasks, state.sortMode).forEach((task) => {
+  const visibleTasks = filterTasksByQuery(state.tasks, state.searchQuery);
+
+  visibleTasks.forEach((task) => {
     const card = createTaskCard(task);
     if (lists[task.status]) {
       lists[task.status].append(card);
@@ -102,7 +118,7 @@ form.addEventListener("submit", (event) => {
   event.preventDefault();
 
   try {
-    const task = createTask(taskTitleInput.value, taskOwnerInput.value);
+    const task = createTask(taskTitleInput.value, taskOwnerInput.value, taskPriorityInput.value);
     state.tasks.push(task);
     saveState();
     render();
@@ -114,6 +130,8 @@ form.addEventListener("submit", (event) => {
 
 sortModeSelect.addEventListener("change", () => {
   state.sortMode = sortModeSelect.value;
+taskSearchInput.addEventListener("input", (event) => {
+  state.searchQuery = event.target.value;
   render();
 });
 
