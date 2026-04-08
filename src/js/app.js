@@ -1,9 +1,10 @@
-import { createTask, filterTasksByQuery } from "./utils.js";
+import { createTask, filterTasksByQuery, sortTasks } from "./utils.js";
 
 const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
 const taskSearchInput = document.querySelector("#task-search");
+const taskSortInput = document.querySelector("#task-sort");
 const taskPriorityInput = document.querySelector("#task-priority");
 const taskDeadlineInput = document.querySelector("#task-deadline");
 const todoList = document.querySelector("#todo-list");
@@ -18,7 +19,8 @@ const lists = {
 
 const state = {
   tasks: [],
-  searchQuery: ""
+  searchQuery: "",
+  sortMode: "oldest"
 };
 
 function saveState() {
@@ -30,7 +32,16 @@ function loadState() {
   if (!saved) return;
 
   try {
-    state.tasks = JSON.parse(saved);
+    state.tasks = JSON.parse(saved).map((task) => {
+      if (Number.isFinite(task.createdAt)) {
+        return task;
+      }
+
+      return {
+        ...task,
+        createdAt: Number.isFinite(task.id) ? task.id : Date.now()
+      };
+    });
   } catch {
     state.tasks = [];
   }
@@ -132,8 +143,9 @@ function render() {
   });
 
   const visibleTasks = filterTasksByQuery(state.tasks, state.searchQuery);
+  const orderedTasks = sortTasks(visibleTasks, state.sortMode);
 
-  visibleTasks.forEach((task) => {
+  orderedTasks.forEach((task) => {
     const card = createTaskCard(task);
     lists[task.status].append(card);
   });
@@ -160,6 +172,11 @@ form.addEventListener("submit", (event) => {
 
 taskSearchInput.addEventListener("input", (event) => {
   state.searchQuery = event.target.value;
+  render();
+});
+
+taskSortInput.addEventListener("change", (event) => {
+  state.sortMode = event.target.value;
   render();
 });
 
