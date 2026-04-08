@@ -1,8 +1,9 @@
-import { createTask } from "./utils.js";
+import { createTask, filterTasksByQuery } from "./utils.js";
 
 const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
+const taskSearchInput = document.querySelector("#task-search");
 const taskPriorityInput = document.querySelector("#task-priority");
 const todoList = document.querySelector("#todo-list");
 const doingList = document.querySelector("#doing-list");
@@ -15,7 +16,8 @@ const lists = {
 };
 
 const state = {
-  tasks: []
+  tasks: [],
+  searchQuery: ""
 };
 
 function saveState() {
@@ -88,7 +90,9 @@ function render() {
     list.innerHTML = "";
   });
 
-  state.tasks.forEach((task) => {
+  const visibleTasks = filterTasksByQuery(state.tasks, state.searchQuery);
+
+  visibleTasks.forEach((task) => {
     const card = createTaskCard(task);
     lists[task.status].append(card);
   });
@@ -106,6 +110,11 @@ form.addEventListener("submit", (event) => {
   } catch (error) {
     alert(error.message);
   }
+});
+
+taskSearchInput.addEventListener("input", (event) => {
+  state.searchQuery = event.target.value;
+  render();
 });
 
 loadState();
