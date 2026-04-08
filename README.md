@@ -63,13 +63,10 @@ Tahapan otomatis saat push/PR ke `master/main`:
    - `npm run start`
 4. Buka browser ke URL dari terminal (umumnya `http://localhost:3000`)
 
-## 9. Script Demo Presentasi (singkat)
+## 9. Script Demo Presentasi
 1. Tunjukkan board task di aplikasi web
 2. Tunjukkan struktur branch (`master`, `feature/*`)
 3. Buat perubahan kecil di branch fitur
 4. Buat Pull Request ke `master`
 5. Tunjukkan pipeline berjalan (lint, test, build)
 6. Tunjukkan status hijau lalu merge
-
-## 10. Catatan Deadline
-Sesuai instruksi: presentasi minggu depan di hari yang sama. Pastikan pipeline sudah pernah berhasil minimal 1 kali sebelum demo.

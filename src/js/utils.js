@@ -15,10 +15,30 @@ export function normalizeTaskPriority(priority) {
   return "medium";
 }
 
-export function createTask(title, owner, priority = "medium") {
+export function normalizeTaskDeadline(deadline) {
+  const normalizedDeadline = String(deadline || "").trim();
+  if (!normalizedDeadline) {
+    return "";
+  }
+
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  if (!datePattern.test(normalizedDeadline)) {
+    return "";
+  }
+
+  const parsedDate = new Date(`${normalizedDeadline}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  return normalizedDeadline;
+}
+
+export function createTask(title, owner, priority = "medium", deadline = "") {
   const normalizedTitle = normalizeTaskTitle(title);
   const normalizedOwner = String(owner || "").trim();
   const normalizedPriority = normalizeTaskPriority(priority);
+  const normalizedDeadline = normalizeTaskDeadline(deadline);
 
   if (!normalizedTitle) {
     throw new Error("Judul task tidak boleh kosong");
@@ -29,6 +49,7 @@ export function createTask(title, owner, priority = "medium") {
     title: normalizedTitle,
     owner: normalizedOwner || "Unassigned",
     priority: normalizedPriority,
+    deadline: normalizedDeadline,
     status: "todo"
   };
 }
