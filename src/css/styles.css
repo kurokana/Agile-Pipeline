@@ -157,6 +157,10 @@ button {
   padding: 0.2rem 0.6rem;
 }
 
+.task-overdue-badge[hidden] {
+  display: none;
+}
+
 .task-action {
   width: 100%;
   background: var(--accent-soft);

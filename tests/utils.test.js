@@ -29,6 +29,10 @@ describe("normalizeTaskDeadline", () => {
     expect(normalizeTaskDeadline("31-12-2026")).toBe("");
   });
 
+  it("mengembalikan nilai kosong untuk tanggal kalender yang tidak valid", () => {
+    expect(normalizeTaskDeadline("2026-02-31")).toBe("");
+  });
+
   it("mengembalikan tanggal valid format yyyy-mm-dd", () => {
     expect(normalizeTaskDeadline("2026-12-31")).toBe("2026-12-31");
   });

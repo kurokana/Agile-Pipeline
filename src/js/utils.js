@@ -26,8 +26,18 @@ export function normalizeTaskDeadline(deadline) {
     return "";
   }
 
-  const parsedDate = new Date(`${normalizedDeadline}T00:00:00`);
-  if (Number.isNaN(parsedDate.getTime())) {
+  const [yearString, monthString, dayString] = normalizedDeadline.split("-");
+  const year = Number(yearString);
+  const month = Number(monthString);
+  const day = Number(dayString);
+
+  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  const isSameDate =
+    parsedDate.getUTCFullYear() === year &&
+    parsedDate.getUTCMonth() + 1 === month &&
+    parsedDate.getUTCDate() === day;
+
+  if (Number.isNaN(parsedDate.getTime()) || !isSameDate) {
     return "";
   }
 

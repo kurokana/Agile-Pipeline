@@ -1,4 +1,4 @@
-import { createTask, filterTasksByQuery, sortTasks } from "./utils.js";
+import { createTask, filterTasksByQuery, normalizeTaskDeadline, sortTasks } from "./utils.js";
 
 const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
@@ -32,16 +32,33 @@ function loadState() {
   if (!saved) return;
 
   try {
+    let hasMigration = false;
     state.tasks = JSON.parse(saved).map((task) => {
-      if (Number.isFinite(task.createdAt)) {
-        return task;
+      const createdAt = Number.isFinite(task.createdAt)
+        ? task.createdAt
+        : Number.isFinite(task.id)
+          ? task.id
+          : Date.now();
+      const deadline = normalizeTaskDeadline(task.deadline);
+      const status = task.status === "todo" || task.status === "doing" || task.status === "done"
+        ? task.status
+        : "todo";
+
+      if (createdAt !== task.createdAt || deadline !== (task.deadline || "") || status !== task.status) {
+        hasMigration = true;
       }
 
       return {
         ...task,
-        createdAt: Number.isFinite(task.id) ? task.id : Date.now()
+        createdAt,
+        deadline,
+        status
       };
     });
+
+    if (hasMigration) {
+      saveState();
+    }
   } catch {
     state.tasks = [];
   }
@@ -86,20 +103,26 @@ function isOverdue(task) {
     return false;
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const taskDeadline = new Date(`${task.deadline}T00:00:00`);
-
-  if (Number.isNaN(taskDeadline.getTime())) {
+  const deadlinePattern = /^\d{4}-\d{2}-\d{2}$/;
+  if (!deadlinePattern.test(task.deadline)) {
     return false;
   }
 
-  return taskDeadline < today;
+  const now = new Date();
+  const todayKey = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+  ].join("-");
+
+  // For YYYY-MM-DD, lexical comparison is equivalent to chronological comparison.
+  return task.deadline < todayKey;
 }
 
 function createTaskCard(task) {
+  const overdue = isOverdue(task);
   const item = document.createElement("li");
-  item.className = `task-card${isOverdue(task) ? " task-overdue" : ""}`;
+  item.className = `task-card${overdue ? " task-overdue" : ""}`;
 
   const meta = document.createElement("div");
   meta.className = "task-meta";
@@ -125,7 +148,7 @@ function createTaskCard(task) {
   const overdueBadge = document.createElement("p");
   overdueBadge.className = "task-overdue-badge";
   overdueBadge.textContent = "Terlambat";
-  overdueBadge.hidden = !isOverdue(task);
+  overdueBadge.hidden = !overdue;
 
   const button = document.createElement("button");
   button.type = "button";
