@@ -27,17 +27,18 @@ function loadState() {
   const saved = localStorage.getItem("agile_pipeline_tasks");
   if (!saved) return;
 
-  try {
-    state.tasks = JSON.parse(saved).map((task) => {
-      if (Number.isFinite(task.createdAt)) {
-        return task;
-      }
+  const validStatuses = Object.keys(lists);
 
-      return {
-        ...task,
-        createdAt: Number.isFinite(task.id) ? task.id : Date.now()
-      };
-    });
+  try {
+    state.tasks = JSON.parse(saved).map((task) => ({
+      ...task,
+      createdAt: Number.isFinite(task.createdAt)
+        ? task.createdAt
+        : Number.isFinite(task.id)
+          ? task.id
+          : Date.now(),
+      status: validStatuses.includes(task.status) ? task.status : "todo"
+    }));
   } catch {
     state.tasks = [];
   }
