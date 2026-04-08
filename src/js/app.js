@@ -1,8 +1,9 @@
-import { createTask } from "./utils.js";
+import { createTask, sortTasks } from "./utils.js";
 
 const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
+const sortModeSelect = document.querySelector("#sort-mode");
 const todoList = document.querySelector("#todo-list");
 const doingList = document.querySelector("#doing-list");
 const doneList = document.querySelector("#done-list");
@@ -14,7 +15,8 @@ const lists = {
 };
 
 const state = {
-  tasks: []
+  tasks: [],
+  sortMode: "oldest"
 };
 
 function saveState() {
@@ -26,7 +28,16 @@ function loadState() {
   if (!saved) return;
 
   try {
-    state.tasks = JSON.parse(saved);
+    state.tasks = JSON.parse(saved).map((task) => {
+      if (Number.isFinite(task.createdAt)) {
+        return task;
+      }
+
+      return {
+        ...task,
+        createdAt: Number.isFinite(task.id) ? task.id : Date.now()
+      };
+    });
   } catch {
     state.tasks = [];
   }
@@ -78,9 +89,11 @@ function render() {
     list.innerHTML = "";
   });
 
-  state.tasks.forEach((task) => {
+  sortTasks(state.tasks, state.sortMode).forEach((task) => {
     const card = createTaskCard(task);
-    lists[task.status].append(card);
+    if (lists[task.status]) {
+      lists[task.status].append(card);
+    }
   });
 }
 
@@ -96,6 +109,11 @@ form.addEventListener("submit", (event) => {
   } catch (error) {
     alert(error.message);
   }
+});
+
+sortModeSelect.addEventListener("change", () => {
+  state.sortMode = sortModeSelect.value;
+  render();
 });
 
 loadState();
