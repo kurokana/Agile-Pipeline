@@ -44,14 +44,43 @@ export function createTask(title, owner, priority = "medium", deadline = "") {
     throw new Error("Judul task tidak boleh kosong");
   }
 
+  const now = Date.now();
+
   return {
-    id: Date.now(),
+    id: now,
+    createdAt: now,
     title: normalizedTitle,
     owner: normalizedOwner || "Unassigned",
     priority: normalizedPriority,
     deadline: normalizedDeadline,
     status: "todo"
   };
+}
+
+function getTaskTimestamp(task) {
+  if (Number.isFinite(task.createdAt)) {
+    return task.createdAt;
+  }
+
+  if (Number.isFinite(task.id)) {
+    return task.id;
+  }
+
+  return 0;
+}
+
+export function sortTasks(tasks, mode = "oldest") {
+  const sorted = [...tasks];
+
+  if (mode === "newest") {
+    return sorted.sort((a, b) => getTaskTimestamp(b) - getTaskTimestamp(a));
+  }
+
+  if (mode === "title-asc") {
+    return sorted.sort((a, b) => a.title.localeCompare(b.title, "id", { sensitivity: "base" }));
+  }
+
+  return sorted.sort((a, b) => getTaskTimestamp(a) - getTaskTimestamp(b));
 }
 
 export function filterTasksByQuery(tasks, query) {
