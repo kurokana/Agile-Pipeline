@@ -4,6 +4,7 @@ const form = document.querySelector("#task-form");
 const taskTitleInput = document.querySelector("#task-title");
 const taskOwnerInput = document.querySelector("#task-owner");
 const taskPriorityInput = document.querySelector("#task-priority");
+const priorityFilter = document.querySelector("#priority-filter");
 const todoList = document.querySelector("#todo-list");
 const doingList = document.querySelector("#doing-list");
 const doneList = document.querySelector("#done-list");
@@ -15,7 +16,8 @@ const lists = {
 };
 
 const state = {
-  tasks: []
+  tasks: [],
+  filter: "all"
 };
 
 function saveState() {
@@ -31,6 +33,29 @@ function loadState() {
   } catch {
     state.tasks = [];
   }
+}
+
+function getPriorityOrder() {
+  return { low: 1, medium: 2, high: 3 };
+}
+
+function sortTasksByPriority(tasks, order) {
+  const priorityOrder = getPriorityOrder();
+  return [...tasks].sort((a, b) => {
+    if (order === "low-to-high") {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    } else if (order === "high-to-low") {
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    }
+    return 0; // no sorting for "all"
+  });
+}
+
+function getFilteredTasks() {
+  if (state.filter === "all") {
+    return state.tasks;
+  }
+  return sortTasksByPriority(state.tasks, state.filter);
 }
 
 function moveTask(taskId) {
@@ -88,7 +113,8 @@ function render() {
     list.innerHTML = "";
   });
 
-  state.tasks.forEach((task) => {
+  const filteredTasks = getFilteredTasks();
+  filteredTasks.forEach((task) => {
     const card = createTaskCard(task);
     lists[task.status].append(card);
   });
@@ -106,6 +132,11 @@ form.addEventListener("submit", (event) => {
   } catch (error) {
     alert(error.message);
   }
+});
+
+priorityFilter.addEventListener("change", (event) => {
+  state.filter = event.target.value;
+  render();
 });
 
 loadState();

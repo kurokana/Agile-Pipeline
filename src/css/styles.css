@@ -39,6 +39,26 @@ body {
   margin: 0 auto 2.5rem;
 }
 
+.filter-section {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--surface), white 20%);
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgb(0 0 0 / 8%);
+}
+
+.filter-section label {
+  font-weight: 700;
+}
+
+.filter-section select {
+  flex: 0 0 auto;
+}
+
 .card {
   background: color-mix(in srgb, var(--surface), white 20%);
   border: 2px solid var(--line);
